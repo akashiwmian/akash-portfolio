@@ -18,6 +18,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +26,13 @@ export default function Navbar() {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
+      }
+
+      // Scroll progress percentage
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        const currentProgress = (window.scrollY / totalScroll) * 100;
+        setScrollProgress(currentProgress);
       }
 
       const sections = ['about', 'research', 'experience', 'project', 'publications', 'skills', 'references', 'contact'];
@@ -66,6 +74,11 @@ export default function Navbar() {
           : 'bg-transparent py-5'
       }`}
     >
+      {/* Top Scroll Reading Progress Bar */}
+      <div
+        className="absolute top-0 left-0 h-[2.5px] bg-gradient-to-r from-nature-primary via-nature-water to-nature-accent transition-all duration-75 z-50"
+        style={{ width: `${scrollProgress}%` }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Brand Logo */}

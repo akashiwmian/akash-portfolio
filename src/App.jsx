@@ -10,6 +10,8 @@ import SkillsSection from './components/SkillsSection';
 import ReferencesSection from './components/ReferencesSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+import AnimatedSection from './components/AnimatedSection';
+import ScrollProgressButton from './components/ScrollProgressButton';
 
 export default function App() {
   return (
@@ -23,33 +25,51 @@ export default function App() {
         <Hero />
 
         {/* 2. About Me & Academic Profile */}
-        <About />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <About />
+        </AnimatedSection>
 
         {/* 3. Research Interests (10 Cards) */}
-        <ResearchInterests />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <ResearchInterests />
+        </AnimatedSection>
 
         {/* 4. Research Experience (Timeline & Workflow) */}
-        <ResearchExperience />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <ResearchExperience />
+        </AnimatedSection>
 
         {/* 5. Featured Project & Interactive Simulator (Boro Rice AWD & CMIP6) */}
-        <FeaturedProject />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <FeaturedProject />
+        </AnimatedSection>
 
         {/* 6. Featured Journal Publications */}
-        <Publications />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <Publications />
+        </AnimatedSection>
 
         {/* 7. Technical & Modeling Skills */}
-        <SkillsSection />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <SkillsSection />
+        </AnimatedSection>
 
         {/* 8. Academic References */}
-        <ReferencesSection />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <ReferencesSection />
+        </AnimatedSection>
 
         {/* 9. Contact & Scientific Inquiry */}
-        <ContactSection />
+        <AnimatedSection animation="fade-up" threshold={0.06}>
+          <ContactSection />
+        </AnimatedSection>
       </main>
 
       {/* Footer */}
       <Footer />
+
+      {/* Floating Scroll-to-Top Button with Live Percentage & Progress Ring */}
+      <ScrollProgressButton />
     </div>
   );
 }
-
