@@ -11,10 +11,16 @@ import {
   Building2, 
   Sparkles, 
   MessageSquare,
-  Globe2
+  Globe2,
+  AlertCircle,
+  Loader2,
+  Settings,
+  HelpCircle
 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { personalData } from '../data/portfolioData';
 import SocialLinks from './SocialLinks';
+import { EMAILJS_CONFIG } from '../config/emailjs';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -23,17 +29,77 @@ export default function ContactSection() {
     subject: '',
     message: ''
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const [errorMessage, setErrorMessage] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [showConfigHelper, setShowConfigHelper] = useState(false);
+  const [customTemplateId, setCustomTemplateId] = useState(EMAILJS_CONFIG.getTemplateId());
+
+  const handleSendEmail = async (templateIdToUse) => {
+    setIsSending(true);
+    setSubmitStatus(null);
+    setErrorMessage('');
+
+    const activeTemplateId = templateIdToUse || customTemplateId || EMAILJS_CONFIG.getTemplateId();
+
+    const templateParams = {
+      from_name: formData.name,
+      name: formData.name,
+      from_email: formData.email,
+      email: formData.email,
+      reply_to: formData.email,
+      subject: formData.subject || 'Scientific Inquiry via Portfolio',
+      message: formData.message,
+      time: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+      to_name: 'Akash',
+      to_email: 'akash.2005049@bau.edu.bd',
+    };
+
+    try {
+      await emailjs.send(
+        EMAILJS_CONFIG.serviceId,
+        activeTemplateId,
+        templateParams,
+        EMAILJS_CONFIG.publicKey
+      );
+
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setShowConfigHelper(false);
+    } catch (err) {
+      console.error('EmailJS Error:', err);
+      setSubmitStatus('error');
+      const errText = err?.text || err?.message || '';
+      if (errText.includes('Template ID') || errText.includes('No records found') || !activeTemplateId) {
+        setErrorMessage(
+          'EmailJS Template ID is not registered yet. In your EmailJS account, go to "Email Templates" to create or copy your Template ID (e.g. template_xxxxxxx).'
+        );
+        setShowConfigHelper(true);
+      } else {
+        setErrorMessage(errText || 'Unable to deliver message automatically via EmailJS.');
+      }
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 4000);
+    handleSendEmail(customTemplateId);
+  };
+
+  const handleSaveTemplateId = (e) => {
+    e.preventDefault();
+    if (!customTemplateId.trim()) return;
+    EMAILJS_CONFIG.setTemplateId(customTemplateId.trim());
+    if (formData.name && formData.email && formData.message) {
+      handleSendEmail(customTemplateId.trim());
+    } else {
+      setShowConfigHelper(false);
+      setSubmitStatus(null);
+    }
   };
 
   const copyEmail = () => {
@@ -186,31 +252,143 @@ export default function ContactSection() {
 
           </div>
 
-          {/* Right Column: Interactive Scientific Inquiry Form */}
+          {/* Right Column: Live EmailJS Direct Transmission Form */}
           <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-nature-border shadow-elevated">
             
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-nature-primary">
-                Send a Message or Research Inquiry
-              </h3>
-              <p className="text-xs text-nature-muted mt-1">
-                Fill in your details below for graduate supervision, research proposals, or data exchange inquiries.
-              </p>
-            </div>
-
-            {submitted ? (
-              <div className="p-8 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3 animate-fadeIn">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                  <Check className="w-6 h-6" />
-                </div>
-                <h4 className="text-base font-bold text-emerald-900">
-                  Message Dispatched Successfully!
-                </h4>
-                <p className="text-xs text-emerald-700 max-w-sm mx-auto">
-                  Thank you for reaching out. Akash will review your communication and respond at the earliest convenience.
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-nature-border">
+              <div>
+                <h3 className="text-lg font-bold text-nature-primary">
+                  Send a Direct Message to Akash
+                </h3>
+                <p className="text-xs text-nature-muted mt-0.5">
+                  Delivered straight to Akash's personal inbox via EmailJS.
                 </p>
               </div>
-            ) : (
+              <div className="flex items-center space-x-2">
+                <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>EmailJS Ready</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowConfigHelper(!showConfigHelper)}
+                  title="Configure EmailJS Template ID"
+                  className="p-1.5 rounded-lg bg-nature-sand hover:bg-nature-border text-nature-muted hover:text-nature-primary transition-colors text-xs"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Template ID Helper / Configuration Drawer */}
+            {showConfigHelper && (
+              <div className="mb-6 p-4 rounded-2xl bg-nature-surface border-2 border-dashed border-nature-accent/60 space-y-3 animate-fadeIn">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-2 text-nature-primary text-xs font-bold">
+                    <Settings className="w-4 h-4 text-nature-water" />
+                    <span>EmailJS Template Configuration</span>
+                  </div>
+                  <a
+                    href="https://dashboard.emailjs.com/admin/templates"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-semibold text-nature-waterDark hover:underline inline-flex items-center space-x-1"
+                  >
+                    <span>Open EmailJS Dashboard</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+
+                <p className="text-xs text-nature-text/80 leading-relaxed">
+                  In EmailJS, emails require a <strong>Template ID</strong>. Go to <strong>EmailJS Dashboard &gt; Email Templates</strong>, create or select your template, and paste the Template ID (e.g. <code className="px-1 py-0.5 rounded bg-white font-mono text-[10px]">template_xxxxxxx</code>) below:
+                </p>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Enter Template ID (e.g. template_1234abc)"
+                    value={customTemplateId}
+                    onChange={(e) => setCustomTemplateId(e.target.value)}
+                    className="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-nature-border focus:border-nature-primary focus:outline-none font-mono text-nature-text"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveTemplateId}
+                    className="px-4 py-2 rounded-xl bg-nature-primary text-white text-xs font-bold hover:bg-nature-secondary transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Success Message Banner */}
+            {submitStatus === 'success' && (
+              <div className="mb-6 p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3 animate-fadeIn">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-sm">
+                  <Check className="w-6 h-6" />
+                </div>
+                <h4 className="text-base font-bold text-emerald-950">
+                  Email Dispatched Directly to Akash!
+                </h4>
+                <p className="text-xs text-emerald-800 max-w-md mx-auto leading-relaxed">
+                  Thank you for reaching out. Your message has been routed via EmailJS directly to Akash's address (<span className="font-semibold underline">akash.2005049@bau.edu.bd</span>).
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => setSubmitStatus(null)}
+                    className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline"
+                  >
+                    Send another message
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message with Fallback Direct Mailto & WhatsApp */}
+            {submitStatus === 'error' && (
+              <div className="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-3 animate-fadeIn">
+                <div className="flex items-start space-x-2.5">
+                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-amber-950">Transmission Note:</div>
+                    <p className="mt-0.5 text-amber-800 leading-relaxed">
+                      {errorMessage}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-amber-200/80">
+                  <a
+                    href={`mailto:${personalData.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(formData.message + '\n\nFrom: ' + formData.name + ' (' + formData.email + ')')}`}
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-600 text-white font-bold hover:bg-amber-700 transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Send via Email Client</span>
+                  </a>
+
+                  <a
+                    href={`https://wa.me/akashiwmian?text=${encodeURIComponent('Hello Akash, my name is ' + (formData.name || 'a visitor') + '. ' + (formData.message || ''))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#25D366] text-white font-bold hover:bg-[#128C7E] transition-colors"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Message on WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowConfigHelper(true)}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-900 font-semibold hover:bg-amber-100 transition-colors"
+                  >
+                    Set Template ID
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {submitStatus !== 'success' && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -220,6 +398,7 @@ export default function ContactSection() {
                     </label>
                     <input
                       type="text"
+                      name="from_name"
                       required
                       placeholder="e.g. Prof. / Dr. Jane Doe"
                       value={formData.name}
@@ -230,10 +409,11 @@ export default function ContactSection() {
 
                   <div>
                     <label className="block text-xs font-bold text-nature-primary mb-1.5">
-                      Email Address *
+                      Your Email Address *
                     </label>
                     <input
                       type="email"
+                      name="from_email"
                       required
                       placeholder="e.g. jane.doe@university.edu"
                       value={formData.email}
@@ -249,6 +429,7 @@ export default function ContactSection() {
                   </label>
                   <input
                     type="text"
+                    name="subject"
                     placeholder="e.g. Graduate Fellowship / AquaCrop Modeling Collaboration"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -261,6 +442,7 @@ export default function ContactSection() {
                     Message Body *
                   </label>
                   <textarea
+                    name="message"
                     required
                     rows={5}
                     placeholder="Please describe your research question, proposal, or inquiry..."
@@ -270,14 +452,28 @@ export default function ContactSection() {
                   />
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 flex items-center justify-between">
                   <button
                     type="submit"
-                    className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-nature-primary text-white text-xs font-bold shadow-elevated hover:bg-nature-secondary transition-all"
+                    disabled={isSending}
+                    className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-nature-primary text-white text-xs font-bold shadow-elevated hover:bg-nature-secondary disabled:opacity-60 transition-all transform hover:-translate-y-0.5 active:scale-95"
                   >
-                    <span>Send Inquiry</span>
-                    <Send className="w-3.5 h-3.5" />
+                    {isSending ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending via EmailJS...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Send Direct Email</span>
+                        <Send className="w-3.5 h-3.5" />
+                      </>
+                    )}
                   </button>
+
+                  <span className="text-[11px] text-nature-muted font-mono hidden sm:inline-block">
+                    Direct • SSL Encrypted
+                  </span>
                 </div>
 
               </form>
@@ -291,4 +487,3 @@ export default function ContactSection() {
     </section>
   );
 }
-
