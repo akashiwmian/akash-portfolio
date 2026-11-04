@@ -5,13 +5,13 @@ import {
   MapPin, 
   GraduationCap, 
   Droplet, 
-  Award, 
   BookOpen, 
-  Sparkles, 
   CheckCircle2, 
   ExternalLink 
 } from 'lucide-react';
 import { personalData } from '../data/portfolioData';
+import SocialLinks from './SocialLinks';
+import profilePhoto from '../assets/my_image.jpeg';
 
 export default function Hero() {
   return (
@@ -24,7 +24,7 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          {/* Left Column: Editorial Headline & Actions */}
+          {/* Left Column: Editorial Headline, Actions & Social Links */}
           <div className="lg:col-span-7 space-y-6">
             
             {/* Top Pill / Badge */}
@@ -71,7 +71,7 @@ export default function Hero() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-4">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <a
                 href="#publications"
                 className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-nature-primary text-white text-sm font-bold shadow-elevated hover:bg-nature-secondary hover:shadow-lg transition-all transform hover:-translate-y-0.5 group"
@@ -88,6 +88,14 @@ export default function Hero() {
                 <Download className="w-4 h-4 text-nature-primary group-hover:-translate-y-0.5 transition-transform" />
                 <span>Download My CV</span>
               </a>
+            </div>
+
+            {/* Social Media Links Row with Icons */}
+            <div className="pt-2">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-nature-muted mb-2.5 font-semibold">
+                Connect Directly via Channels
+              </div>
+              <SocialLinks variant="pills" />
             </div>
 
             {/* Quick Stat Highlights */}
@@ -109,7 +117,7 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column: Scientific Visual & Profile Presentation Card */}
+          {/* Right Column: Profile Presentation Card with Actual Photo */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
@@ -132,26 +140,23 @@ export default function Hero() {
                   </span>
                 </div>
 
-                {/* Profile Placeholder Graphic / Modern Academic Avatar */}
+                {/* Profile Portrait Card with actual photo my_image.jpeg */}
                 <div className="mt-5 relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#163D2B] via-[#102B21] to-[#0A1B14] p-6 text-white text-center shadow-inner">
                   {/* Subtle Agro-Grid background lines inside avatar */}
                   <div className="absolute inset-0 opacity-15 bg-water-grid pointer-events-none" />
 
-                  {/* Water Droplet Motif / Animated Ring */}
-                  <div className="relative mx-auto w-32 h-32 rounded-full p-1.5 bg-gradient-to-tr from-nature-accent via-nature-water to-white/60 shadow-elevated flex items-center justify-center">
-                    <div className="w-full h-full rounded-full bg-[#143525] flex flex-col items-center justify-center relative overflow-hidden border-2 border-white/20">
-                      {/* Stylized Silhouette & Initials */}
-                      <span className="text-4xl font-black tracking-widest text-nature-surface">
-                        AK
-                      </span>
-                      <span className="text-[10px] font-mono tracking-wider text-nature-accent">
-                        RESEARCHER
-                      </span>
-                      
-                      {/* Floating mini badge */}
-                      <div className="absolute bottom-1 bg-nature-water text-white rounded-full p-1 shadow-sm">
-                        <Droplet className="w-3 h-3 fill-current" />
-                      </div>
+                  {/* Profile Photo Display */}
+                  <div className="relative mx-auto w-36 h-36 rounded-full p-1.5 bg-gradient-to-tr from-nature-accent via-nature-water to-white shadow-elevated flex items-center justify-center group">
+                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/40 shadow-inner relative bg-[#143525]">
+                      <img
+                        src={profilePhoto}
+                        alt={personalData.name}
+                        className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    {/* Floating verified badge */}
+                    <div className="absolute bottom-1 right-2 bg-nature-water text-white rounded-full p-1.5 shadow-md border-2 border-[#102B21]">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
                     </div>
                   </div>
 
@@ -231,4 +236,3 @@ export default function Hero() {
     </section>
   );
 }
-

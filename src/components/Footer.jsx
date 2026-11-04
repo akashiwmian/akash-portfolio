@@ -8,6 +8,7 @@ import {
   GraduationCap 
 } from 'lucide-react';
 import { personalData } from '../data/portfolioData';
+import SocialLinks from './SocialLinks';
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -47,6 +48,11 @@ export default function Footer() {
             <div className="flex items-center space-x-2 text-xs text-gray-400">
               <MapPin className="w-3.5 h-3.5 text-nature-accent" />
               <span>Tangail &amp; BAU, Mymensingh, Bangladesh</span>
+            </div>
+
+            {/* Social Media Channels Row */}
+            <div className="pt-2">
+              <SocialLinks variant="icons-only" />
             </div>
           </div>
 

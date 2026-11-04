@@ -14,6 +14,7 @@ import {
   Globe2
 } from 'lucide-react';
 import { personalData } from '../data/portfolioData';
+import SocialLinks from './SocialLinks';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -160,42 +161,13 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              {/* Scholarly Profiles */}
+              {/* Social & Academic Networks */}
               <div className="pt-4 border-t border-nature-border">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-nature-muted mb-3">
-                  Scholarly Profiles &amp; Networks
+                <div className="text-[11px] font-bold uppercase tracking-wider text-nature-muted mb-3 flex items-center justify-between">
+                  <span>Social &amp; Academic Profiles</span>
+                  <span className="text-[10px] text-nature-waterDark font-mono">7 Connected Channels</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <a
-                    href={personalData.socials.scholar}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-nature-surface border border-nature-border hover:border-nature-accent hover:bg-white text-nature-primary transition-all text-center"
-                  >
-                    <Globe2 className="w-4 h-4 text-nature-water mb-1" />
-                    <span className="text-[10px] font-bold">Google Scholar</span>
-                  </a>
-
-                  <a
-                    href={personalData.socials.researchgate}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-nature-surface border border-nature-border hover:border-nature-accent hover:bg-white text-nature-primary transition-all text-center"
-                  >
-                    <Sparkles className="w-4 h-4 text-emerald-600 mb-1" />
-                    <span className="text-[10px] font-bold">ResearchGate</span>
-                  </a>
-
-                  <a
-                    href={personalData.socials.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-nature-surface border border-nature-border hover:border-nature-accent hover:bg-white text-nature-primary transition-all text-center"
-                  >
-                    <ExternalLink className="w-4 h-4 text-indigo-600 mb-1" />
-                    <span className="text-[10px] font-bold">LinkedIn</span>
-                  </a>
-                </div>
+                <SocialLinks variant="default" className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2" />
               </div>
 
               {/* CV Action */}
