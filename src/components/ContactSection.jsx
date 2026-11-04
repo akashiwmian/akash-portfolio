@@ -57,11 +57,14 @@ export default function ContactSection() {
     };
 
     try {
+      emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
       await emailjs.send(
         EMAILJS_CONFIG.serviceId,
         activeTemplateId,
         templateParams,
-        EMAILJS_CONFIG.publicKey
+        {
+          publicKey: EMAILJS_CONFIG.publicKey
+        }
       );
 
       setSubmitStatus('success');
@@ -73,7 +76,7 @@ export default function ContactSection() {
       const errText = err?.text || err?.message || '';
       if (errText.includes('Template ID') || errText.includes('No records found') || !activeTemplateId) {
         setErrorMessage(
-          'EmailJS Template ID is not registered yet. In your EmailJS account, go to "Email Templates" to create or copy your Template ID (e.g. template_xxxxxxx).'
+          'EmailJS returned: "No records found". Please verify in your EmailJS dashboard: 1) Email Services: check that service_ps3xpbq is connected and active. 2) Templates: check that template_igojuq3 is saved. 3) API Keys: check that Public Key matches x7E8s_anPNe6eXUIX.'
         );
         setShowConfigHelper(true);
       } else {
